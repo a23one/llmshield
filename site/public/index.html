@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLMShield: the model reads the copy, you keep the original</title>
+<meta name="description" content="A zero-dependency Python library that redacts names, contact details and card numbers from prompts before they leave your process, then writes them back into the reply.">
+<meta name="theme-color" content="#f4f5fa">
+<meta name="author" content="a23one">
+<meta property="og:type" content="website">
+<meta property="og:title" content="LLMShield: the model reads the copy, you keep the original">
+<meta property="og:description" content="Redact personal details before a prompt leaves your Python process, and restore them in the reply. One line, zero dependencies.">
+<meta property="og:image" content="og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/libre-franklin-normal-300-900.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/courier-prime-normal-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="wrap">
+
+  <nav class="nav" aria-label="Primary">
+    <a class="brand" href="#top"><span class="brand-bar" aria-hidden="true"></span>llmshield</a>
+    <a class="hide-sm" href="#route">How it works</a>
+    <a class="hide-sm hide-md" href="#beyond">Tools and output</a>
+    <a class="hide-sm" href="#key">What it redacts</a>
+    <a class="hide-sm hide-md" href="#faq">Questions</a>
+    <a href="https://github.com/brainpolo/llmshield#readme">Docs</a>
+    <a class="gh" href="https://github.com/brainpolo/llmshield">GitHub</a>
+  </nav>
+
+  <main id="main">
+    <header class="hero" id="top">
+      <h1>The model reads the copy. You keep the original.</h1>
+      <div class="hero-sub">
+        <p>LLMShield redacts names, contact details and card numbers from a prompt before it leaves your Python process, then writes them back into the reply. No gateway, no vault, no dependencies.</p>
+        <div class="hero-actions">
+          <button class="install" type="button" data-copy="pip install llmshield" aria-label="Copy install command: pip install llmshield"><span>pip install llmshield</span><span class="copy" aria-hidden="true">Copy</span></button>
+          <a class="text-link" href="#code">See the setup</a>
+        </div>
+      </div>
+
+      <div class="memo-picker">
+        <p class="memo-tabs-label" id="memo-tabs-label">Load a memo, or type your own</p>
+        <div class="memo-tabs" role="tablist" aria-labelledby="memo-tabs-label" id="memo-tabs"></div>
+      </div>
+
+      <div class="desk">
+        <article class="sheet original" aria-labelledby="orig-tag">
+          <span class="sheet-tag" id="orig-tag">The original, on your server</span>
+          <dl class="memo-head">
+            <div><dt>To</dt><dd>Model provider</dd></div>
+            <div><dt>Re</dt><dd class="memo-re"></dd></div>
+          </dl>
+          <div class="editor">
+            <textarea id="memo" spellcheck="false" aria-describedby="edit-hint" aria-label="Prompt. Edit it to see the copy change."></textarea>
+          </div>
+          <p class="edit-hint pencil" id="edit-hint">Type over this memo. The copy updates as you write.</p>
+        </article>
+
+        <article class="sheet copy" aria-labelledby="copy-tag">
+          <span class="sheet-tag" id="copy-tag">The copy the model receives</span>
+          <dl class="memo-head">
+            <div><dt>To</dt><dd>Model provider</dd></div>
+            <div><dt>Re</dt><dd class="memo-re"></dd></div>
+          </dl>
+          <p class="typed" id="copy"></p>
+          <p class="tally" id="tally" aria-live="polite"></p>
+          <p class="cc"><b>cc:</b> nobody</p>
+        </article>
+      </div>
+
+      <div class="providers">
+        <span>Tested with</span>
+        <ul>
+          <li>OpenAI</li><li>Anthropic</li><li>Google Gemini</li><li>Cohere</li><li>xAI</li>
+        </ul>
+        <span class="more">and OpenAI-compatible APIs like Groq, OpenRouter, Ollama and vLLM</span>
+      </div>
+    </header>
+
+    <section class="section first" id="route" aria-labelledby="route-h">
+      <h2 id="route-h">Every prompt follows the same route.</h2>
+      <p class="lead">Three of the four stops are inside your own process. Only the redacted copy travels, and the reply is restored before your code sees it.</p>
+      <div class="split">
+        <div class="slip">
+          <div class="slip-title"><span>Routing slip</span><span>One request</span></div>
+          <table>
+            <thead><tr><th scope="col"><span class="sr-only">Step</span></th><th scope="col">Stop</th><th scope="col">Where</th></tr></thead>
+            <tbody>
+              <tr><td class="n">1</td><td>Find the personal details<span class="sample">Patterns, Luhn checks and English dictionaries</span></td><td class="where">Your process</td></tr>
+              <tr><td class="n">2</td><td>Swap each for a placeholder<span class="sample">Sarah Johnson becomes <span class="redact">&lt;PERSON_0&gt;</span></span></td><td class="where">Your process</td></tr>
+              <tr class="away"><td class="n">3</td><td>Send the copy with your usual client<span class="sample">Chat, streaming, tools or structured output</span></td><td class="where">Provider</td></tr>
+              <tr><td class="n">4</td><td>Write the originals back into the reply<span class="sample">Even when a stream splits a placeholder</span></td><td class="where">Your process</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="reply-box">
+          <h3>The reply comes back redacted too</h3>
+          <p>The model writes with placeholders, because placeholders are all it has seen. LLMShield fills them back in as the stream arrives.</p>
+          <div class="reply-controls">
+            <div class="switch" role="group" aria-label="Reply view">
+              <button type="button" aria-pressed="false" data-view="model">As the model wrote it</button>
+              <button type="button" aria-pressed="true" data-view="user">As your user reads it</button>
+            </div>
+            <button class="replay" type="button" id="replay">Stream it again</button>
+          </div>
+          <div class="reply-sheet restored" id="reply-sheet"><p class="typed" id="reply" aria-live="polite"></p></div>
+          <p class="stream-note pencil" id="stream-note"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="turns-h">
+      <div class="split">
+        <div>
+          <h2 id="turns-h">Same person, same placeholder, every page.</h2>
+          <p class="lead lead-tight">Entity maps are cached for the whole conversation, so the model can follow who's who across turns without ever learning a name.</p>
+          <div class="switch" role="group" aria-label="Conversation view">
+            <button type="button" aria-pressed="true" data-turns="original">Originals</button>
+            <button type="button" aria-pressed="false" data-turns="copy">The model's copies</button>
+          </div>
+        </div>
+        <div>
+          <div class="pages" id="pages" aria-live="polite"></div>
+          <p class="pages-note pencil" id="pages-note"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="beyond" aria-labelledby="beyond-h">
+      <h2 id="beyond-h">It works past plain text.</h2>
+      <p class="lead">Tool calls and structured output are restored too, so your functions and your types get real values, not placeholders.</p>
+      <div class="forms">
+        <div class="form">
+          <h3>Tool calls</h3>
+          <p class="desc">The model decides to call your function using the only number it knows. Your function receives the real one.</p>
+          <div class="form-rows">
+            <div class="form-row"><span>The model asks for</span><pre>make_call(
+    phone="<span class="redact">&lt;PHONE_4&gt;</span>",
+    note="Refund for <span class="redact">&lt;PERSON_0&gt;</span>",
+)</pre></div>
+            <div class="form-row"><span>Your function gets</span><pre class="real">make_call(
+    phone="<span class="restored-mark">+44 20 7946 0958</span>",
+    note="Refund for <span class="restored-mark">Sarah Johnson</span>",
+)</pre></div>
+          </div>
+        </div>
+        <div class="form">
+          <h3>Structured output</h3>
+          <p class="desc">Ask for a Pydantic model and the parsed fields come back with the originals already in place.</p>
+          <div class="form-rows">
+            <div class="form-row"><span>The model returns</span><pre>Contact(
+    name="<span class="redact">&lt;PERSON_0&gt;</span>",
+    email="<span class="redact">&lt;EMAIL_2&gt;</span>",
+)</pre></div>
+            <div class="form-row"><span>Your code gets</span><pre class="real">Contact(
+    name="<span class="restored-mark">Sarah Johnson</span>",
+    email="<span class="restored-mark">sarah.j@acmecorp.com</span>",
+)</pre></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="code" aria-labelledby="code-h">
+      <h2 id="code-h">Three lines of paperwork.</h2>
+      <p class="lead">Hand LLMShield the function you already call, then call <code>ask()</code> with the same arguments. Your model, your parameters and your response types stay as they are.</p>
+      <div class="split code-split">
+        <div>
+          <div class="folders" role="tablist" aria-label="Provider" id="folders"></div>
+          <div class="paper-code" role="tabpanel" id="code-panel" tabindex="0">
+            <pre id="code-sheet"></pre>
+            <span class="margin-note pencil">all that changes</span>
+          </div>
+        </div>
+        <ul class="notes">
+          <li><b>Streaming</b>Pass <code>stream=True</code>. A placeholder split across chunks is held back until it's whole.</li>
+          <li><b>Long conversations</b>The same value keeps the same placeholder on every turn, so the model never loses track.</li>
+          <li><b>Tools and structured output</b>Arguments and parsed fields are restored before your code runs.</li>
+          <li><b>Any other model</b>Call <code>cloak()</code> and <code>uncloak()</code> yourself around any API or framework.</li>
+        </ul>
+      </div>
+      <div class="extra-code">
+        <div class="mini">
+          <h3>Streaming</h3>
+          <p>You get plain text chunks with the originals already back in.</p>
+<pre><code>stream = shield.ask(
+    model="gpt-5",
+    messages=messages,
+    stream=True,
+)
+for chunk in stream:
+    print(chunk, end="", flush=True)</code></pre>
+        </div>
+        <div class="mini">
+          <h3>Without a client</h3>
+          <p>Cloak and restore by hand for any model or framework.</p>
+<pre><code>shield = LLMShield()
+
+cloaked, entity_map = shield.cloak(
+    "Call John Doe on +44 20 7946 0958"
+)
+<span class="c"># "Call &lt;PERSON_0&gt; on &lt;PHONE_1&gt;"</span>
+
+reply = your_model(cloaked)
+restored = shield.uncloak(reply, entity_map)</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="key" aria-labelledby="key-h">
+      <h2 id="key-h">The redaction key.</h2>
+      <p class="lead">Eight kinds of detail in three families, tuned for English text.</p>
+      <table class="key">
+        <thead><tr><th scope="col">Detail</th><th scope="col">Example</th><th scope="col">Becomes</th><th scope="col" class="how">How it's found</th></tr></thead>
+        <tbody>
+          <tr class="fam"><td colspan="4">Proper nouns</td></tr>
+          <tr><td>Person</td><td class="ex">Dr. Priya Shah</td><td><span class="redact">&lt;PERSON_0&gt;</span></td><td class="how">Name dictionaries, titles and context</td></tr>
+          <tr><td>Organisation</td><td class="ex">Northwind Health</td><td><span class="redact">&lt;ORGANISATION_1&gt;</span></td><td class="how">Dictionaries and company suffixes</td></tr>
+          <tr><td>Place</td><td class="ex">Baker Street</td><td><span class="redact">&lt;PLACE_2&gt;</span></td><td class="how">Place lists and address components</td></tr>
+          <tr class="fam"><td colspan="4">Numbers</td></tr>
+          <tr><td>Phone</td><td class="ex">+44 20 7946 0958</td><td><span class="redact">&lt;PHONE_3&gt;</span></td><td class="how">International and national formats</td></tr>
+          <tr><td>Credit card</td><td class="ex">4111 1111 1111 1111</td><td><span class="redact">&lt;CREDIT_CARD_4&gt;</span></td><td class="how">Card patterns confirmed with a Luhn check</td></tr>
+          <tr class="fam"><td colspan="4">Locators</td></tr>
+          <tr><td>Email</td><td class="ex">priya@northwind.health</td><td><span class="redact">&lt;EMAIL_5&gt;</span></td><td class="how">Address pattern</td></tr>
+          <tr><td>URL</td><td class="ex">https://crm.internal/p/88</td><td><span class="redact">&lt;URL_6&gt;</span></td><td class="how">Links with a protocol</td></tr>
+          <tr><td>IP address</td><td class="ex">10.4.12.201</td><td><span class="redact">&lt;IP_ADDRESS_7&gt;</span></td><td class="how">IPv4 pattern</td></tr>
+        </tbody>
+      </table>
+
+      <div class="tuning">
+        <h3>Adjust what counts as secret</h3>
+        <p>Your own company name shouldn't become a placeholder, and some teams want links left readable. Every setting is a constructor argument.</p>
+        <div class="annotated" tabindex="0" aria-label="Configuration example with notes">
+          <div class="ln"><code>from llmshield import EntityConfig, LLMShield</code><span class="pencil"></span></div>
+          <div class="ln"><code> </code><span class="pencil"></span></div>
+          <div class="ln"><code>shield = LLMShield(</code><span class="pencil"></span></div>
+          <div class="ln"><code>    llm_func=client.messages.create,</code><span class="pencil"></span></div>
+          <div class="ln mark"><code>    allowlist=["Acme", "Acme Corp"],</code><span class="pencil">your own name isn't secret</span></div>
+          <div class="ln mark"><code>    entity_config=EntityConfig().without_urls(),</code><span class="pencil">keep links readable</span></div>
+          <div class="ln mark"><code>    start_delimiter="[[", end_delimiter="]]",</code><span class="pencil">if your text already uses &lt; and &gt;</span></div>
+          <div class="ln mark"><code>    max_cache_size=50_000,</code><span class="pencil">conversations to remember, default 10,000</span></div>
+          <div class="ln"><code>)</code><span class="pencil"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="cc-h">
+      <h2 id="cc-h">Check the cc line.</h2>
+      <p class="lead">A hosted privacy gateway has to read your prompts before it can redact them, which makes it one more recipient. LLMShield is a library: the redaction happens before anything is sent.</p>
+      <div class="cc-grid">
+        <div class="cc-card theirs">
+          <h3>Through a hosted gateway</h3>
+          <dl>
+            <div><dt>Sees originals</dt><dd>You, the gateway and its subprocessors</dd></div>
+            <div><dt>Network hops</dt><dd>Two per request</dd></div>
+            <div><dt>Entity map</dt><dd>Stored in their database</dd></div>
+            <div><dt>Installs</dt><dd>An SDK and its dependency tree</dd></div>
+          </dl>
+        </div>
+        <div class="cc-card">
+          <h3>Through LLMShield</h3>
+          <dl>
+            <div><dt>Sees originals</dt><dd>You</dd></div>
+            <div><dt>Network hops</dt><dd>One, the call you already make</dd></div>
+            <div><dt>Entity map</dt><dd>In memory, in your process</dd></div>
+            <div><dt>Installs</dt><dd>One package. Requires: nothing</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="spec-h">
+      <div class="split">
+        <div>
+          <h2 id="spec-h">Small enough to read in an afternoon.</h2>
+          <p class="lead">You shouldn't have to take a privacy layer on trust. LLMShield is standard-library Python you can audit before it touches your users' data.</p>
+          <a class="text-link" href="https://github.com/brainpolo/llmshield/tree/main/llmshield">Browse the source</a>
+        </div>
+        <div class="spec">
+          <div class="spec-title"><span>Specification</span><span>llmshield 2.1.0</span></div>
+          <dl>
+            <div><dt>Runtime dependencies</dt><dd>None</dd></div>
+            <div><dt>Python</dt><dd>3.12, 3.13, 3.14</dd></div>
+            <div><dt>Source</dt><dd>About 5,000 lines</dd></div>
+            <div><dt>Tests</dt><dd>450+, coverage floor 98%</dd></div>
+            <div><dt>Network calls of its own</dt><dd>None</dd></div>
+            <div><dt>Language</dt><dd>English</dd></div>
+            <div><dt>Licence</dt><dd>AGPL-3.0</dd></div>
+            <div><dt>In production at</dt><dd><a href="https://brainful.one">brainful.one</a></dd></div>
+          </dl>
+          <div class="sign"><span>Maintained by Aditya Dedhia and Sebastian Andres</span><a href="https://a23.one">a23one</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq" aria-labelledby="faq-h">
+      <div class="split faq-split">
+        <h2 id="faq-h">Questions worth asking.</h2>
+        <div class="faq">
+          <details>
+            <summary>Does redaction make the model's answers worse?</summary>
+            <div class="answer">
+              <p>For most tasks, no. Placeholders are typed, so the model still knows it's looking at a person, an email or a phone number, and the same person keeps the same placeholder throughout.</p>
+              <p>Tasks that depend on the value itself, like checking whether an email address is spelled correctly, can't work on a placeholder. Allowlist those terms or switch that type off.</p>
+            </div>
+          </details>
+          <details>
+            <summary>What can it miss?</summary>
+            <div class="answer">
+              <p>Detection uses patterns, checksums and English dictionaries. It can miss unusual names, text in other languages, and identifiers without a recognisable format, such as postcodes or internal account numbers.</p>
+              <p>Treat it as one layer of protection, and check its output against samples of your own data before you rely on it.</p>
+            </div>
+          </details>
+          <details>
+            <summary>Where is the entity map kept?</summary>
+            <div class="answer">
+              <p>In an in-memory LRU cache inside your Python process, holding up to 10,000 conversations by default. LLMShield doesn't write it to disk or send it anywhere. If you choose to persist maps yourself, store them as carefully as the original data.</p>
+            </div>
+          </details>
+          <details>
+            <summary>Which providers and frameworks does it support?</summary>
+            <div class="answer">
+              <p>OpenAI, Anthropic, Google Gemini, Cohere and xAI are tested directly, along with any API that follows the OpenAI format. For anything else, call <code>cloak()</code> before your request and <code>uncloak()</code> on the response.</p>
+            </div>
+          </details>
+          <details>
+            <summary>My prompts already contain &lt; and &gt;. Will that break?</summary>
+            <div class="answer">
+              <p>Choose different delimiters with <code>start_delimiter</code> and <code>end_delimiter</code>, for example <code>[[PERSON_0]]</code>.</p>
+            </div>
+          </details>
+          <details>
+            <summary>What does the AGPL licence mean for my product?</summary>
+            <div class="answer">
+              <p>LLMShield is licensed under AGPL-3.0, which can require you to share source code when you offer software built on it over a network. Read the licence and check it with your legal team before shipping it in a closed-source product.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section close" aria-labelledby="close-h">
+      <h2 id="close-h">Keep the original.</h2>
+      <div class="close-row">
+        <button class="install" type="button" data-copy="pip install llmshield" aria-label="Copy install command: pip install llmshield"><span>pip install llmshield</span><span class="copy" aria-hidden="true">Copy</span></button>
+        <a class="text-link" href="https://github.com/brainpolo/llmshield">Read the source on GitHub</a>
+      </div>
+      <p class="close-note">Python 3.12 or newer. Works with OpenAI, Anthropic, Google Gemini, Cohere, xAI and any OpenAI-compatible endpoint.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span class="who">llmshield by <a href="https://a23.one">a23one</a>. This page loads nothing from third parties.</span>
+    <a href="https://pypi.org/project/llmshield/">PyPI</a>
+    <a href="https://github.com/brainpolo/llmshield">GitHub</a>
+    <a href="https://github.com/brainpolo/llmshield/issues">Report an issue</a>
+    <a href="https://github.com/brainpolo/llmshield/blob/main/CHANGELOG.md">Changelog</a>
+    <a href="https://github.com/brainpolo/llmshield/blob/main/LICENSE.txt">Licence</a>
+  </footer>
+</div>
+
+<script src="cloak.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

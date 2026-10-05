@@ -1,0 +1,10 @@
+// Static landing page for LLMShield, served as Workers static assets.
+// `bun run dev` serves it locally; Cloudflare deploys on push to main.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "llmshield",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./public"
+  }
+}

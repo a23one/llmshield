@@ -1,0 +1,12 @@
+{
+  "name": "llmshield-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun serve.js",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "latest"
+  }
+}

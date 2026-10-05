@@ -58,3 +58,7 @@ docs/out/
 
 # Extensions
 .VSCodeCounter
+# site
+site/node_modules/
+site/.wrangler/
+site/bun.lock
