@@ -1277,9 +1277,9 @@ class TestCoreFunctionality(TestCase):
             (
                 "no_entities",
                 "This is plain text with no PII",
-                ["This", "PII"],
-                ["CONCEPT"],
-            ),  # These might be detected as concepts
+                [],
+                [],
+            ),
             (
                 "repeated_entities",
                 "John called John again",

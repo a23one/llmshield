@@ -215,38 +215,6 @@ class TestProperNounCollection(unittest.TestCase):
         )
         self.assertEqual(len(entities), 0)
 
-    @parameterized.expand(
-        [
-            (
-                "end_of_list",
-                "I've",
-                0,
-                ["I've"],
-                False,
-            ),
-            (
-                "followed_by_lowercase",
-                "I'm",
-                0,
-                ["I'm", "going"],
-                False,
-            ),
-            (
-                "followed_by_uppercase",
-                "I'll",
-                0,
-                ["I'll", "Alice"],
-                True,
-            ),
-        ]
-    )
-    def test_handle_contraction_lookahead(
-        self, description, word, idx, words, expected
-    ):
-        """Test _handle_contraction_lookahead edge cases."""
-        result = EntityDetector._handle_contraction_lookahead(word, idx, words)
-        self.assertEqual(result, expected)
-
 
 class TestPersonDetection(unittest.TestCase):
     """Test person name detection and validation."""
@@ -299,6 +267,24 @@ class TestPersonDetection(unittest.TestCase):
     )
     def test_is_person(self, description, text, expected):
         """Test person detection with various inputs."""
+        self.assertEqual(self.detector._is_person(text), expected)
+
+    @parameterized.expand(
+        [
+            # Regression: possessive stripping must remove the literal
+            # "'s" suffix only, not arbitrary trailing 's' / "'" chars.
+            # Previously used rstrip("'s"), which mangled "Grass" -> "Gra"
+            # and let common nouns through as persons.
+            ("common_noun_grass", "Grass", False),
+            ("common_noun_glass", "Glass", False),
+            ("common_noun_class", "Class", False),
+            ("common_noun_cross", "Cross", False),
+            ("possessive_james", "James's", True),
+            ("possessive_chris", "Chris's", False),
+        ]
+    )
+    def test_possessive_suffix_handling(self, description, text, expected):
+        """Possessive "'s" must be stripped as a suffix, not char-set."""
         self.assertEqual(self.detector._is_person(text), expected)
 
     @parameterized.expand(

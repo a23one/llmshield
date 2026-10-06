@@ -26,12 +26,14 @@ import re
 # - user+tag@domain.co.uk
 # - first.last@subdomain.company.org
 EMAIL_ADDRESS_PATTERN = re.compile(
-    r"\b[a-zA-Z0-9]"  # Start with alphanumeric
-    r"(?:[a-zA-Z0-9\+]"  # Optional middle chars including +
-    r"|[._-](?![._-]))*"  # Single dots/underscores/hyphens not consecutive
-    r"[a-zA-Z0-9]"  # End with alphanumeric
-    r"@"  # @ symbol
-    r"(?:[a-zA-Z0-9][a-zA-Z0-9-]*\.)+"  # Domain parts start with alphanumeric
+    r"\b[a-zA-Z0-9]"  # Start with alphanumeric (single-char local is valid)
+    r"(?:"  # Optional rest of local part:
+    r"(?:[a-zA-Z0-9\+]"  # middle chars (alnum or +)
+    r"|[._-](?![._-]))*"  # or single ./_/- (no consecutive separators)
+    r"[a-zA-Z0-9]"  # ending in alphanumeric
+    r")?"
+    r"@"
+    r"(?:[a-zA-Z0-9][a-zA-Z0-9-]*\.)+"  # Domain parts
     r"[a-zA-Z]{2,}\b",  # TLD
 )
 

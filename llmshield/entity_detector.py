@@ -387,15 +387,10 @@ class EntityDetector:
                 fragment = fragment.replace(split_word, f"{split_word} ")
 
         fragment_words = fragment.split(SPACE)
-        sequential_pnouns = []
+        sequential_pnouns: list[str] = []
         pending_p_noun = ""
-        skip_next = False
 
-        for i, word in enumerate(fragment_words):
-            if skip_next:  # pragma: no cover
-                skip_next = False
-                continue
-
+        for word in fragment_words:
             if not word:
                 continue
 
@@ -404,14 +399,6 @@ class EntityDetector:
                 word, pending_p_noun, sequential_pnouns
             ):
                 pending_p_noun = ""
-                continue
-
-            # Handle contraction lookahead
-            if EntityDetector._handle_contraction_lookahead(  # pragma: no cover  # noqa: E501
-                word, i, fragment_words
-            ):
-                pending_p_noun = fragment_words[i + 1]
-                skip_next = True
                 continue
 
             # Process potential proper noun
@@ -433,17 +420,6 @@ class EntityDetector:
             if pending_p_noun:
                 sequential_pnouns.append(pending_p_noun.strip())
             return True
-        return False
-
-    @staticmethod
-    def _handle_contraction_lookahead(
-        word: str, i: int, fragment_words: list[str]
-    ) -> bool:
-        """Handle lookahead for contractions followed by names."""
-        if i < len(fragment_words) - 1 and word in {"I'm", "I've", "I'll"}:
-            next_word = fragment_words[i + 1]
-            if next_word and next_word[0].isupper():
-                return True
         return False
 
     def _process_word(
@@ -548,7 +524,7 @@ class EntityDetector:
         words = p_noun.split()
 
         # Handle possessives
-        words = [w.rstrip("'s") for w in words]
+        words = [w.removesuffix("'s") for w in words]
 
         # Must have at least one word after cleaning
         if not words:

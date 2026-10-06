@@ -39,8 +39,10 @@ class TestRegexMatchers(TestCase):
             ("numbers_in_domain", "user@domain123.com", True),
             ("hyphen_in_domain", "user@my-domain.com", True),
             ("multiple_subdomains", "user@mail.sub.domain.org", True),
-            # Single letter local part might not be supported
-            ("short_local", "a@domain.com", False),
+            # Single-character locals are RFC-valid (RFC 5321 §4.5.3.1.1)
+            ("short_local_alpha", "a@domain.com", True),
+            ("short_local_digit", "1@domain.com", True),
+            ("short_local_initial", "j@gmail.com", True),
             ("underscore_local", "user_name@domain.com", True),
             # Invalid emails
             ("no_at", "userdomain.com", False),
