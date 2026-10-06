@@ -692,7 +692,7 @@ We plan to add support for other languages in the future.
 Requires [uv](https://docs.astral.sh/uv/) for dependency management.
 
 ```bash
-git clone https://github.com/brainpolo/llmshield.git
+git clone https://github.com/a23one/llmshield.git
 cd llmshield
 uv sync
 ```
@@ -762,9 +762,9 @@ This project is licensed under the **GNU Affero General Public License v3.0** - 
 
 For questions, issues, or feature requests:
 
-- **GitHub Issues**: [Report bugs or request features](https://github.com/brainpolo/llmshield/issues)
-- **Documentation**: [Full documentation](https://llmshield.readthedocs.io)
-- **Community**: [Discussions and support](https://github.com/brainpolo/llmshield/discussions)
+- **GitHub Issues**: [Report bugs or request features](https://github.com/a23one/llmshield/issues)
+- **Documentation**: [Full documentation](https://a23one.github.io/llmshield/)
+- **Community**: [Discussions and support](https://github.com/a23one/llmshield/discussions)
 
 ## Maintainers
 

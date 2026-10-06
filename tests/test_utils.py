@@ -153,7 +153,7 @@ class TestWrapEntity(unittest.TestCase):
             ),
         ]
     )
-    def test_wrap_entity(  # noqa: PLR0913
+    def test_wrap_entity(  # noqa: PLR0913, PLR0917
         self, description, entity_type, suffix, start, end, expected
     ):
         """Test entity wrapping with various delimiters."""

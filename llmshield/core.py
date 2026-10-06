@@ -104,7 +104,7 @@ class LLMShield:
 
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913, PLR0917
         self,
         start_delimiter: str = DEFAULT_START_DELIMITER,
         end_delimiter: str = DEFAULT_END_DELIMITER,

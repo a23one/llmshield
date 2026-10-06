@@ -1178,7 +1178,7 @@ class TestCoreFunctionality(TestCase):
             ),
         ]
     )
-    def test_delimiter_variations(  # noqa: PLR0913
+    def test_delimiter_variations(  # noqa: PLR0913, PLR0917
         self, description, start_delim, end_delim, text, entities, expected
     ):
         """Test various delimiter configurations - parameterized."""

@@ -31,6 +31,7 @@ def cloak_prompt(  # noqa: PLR0913
     prompt: str,
     start_delimiter: str,
     end_delimiter: str,
+    *,
     entity_map: dict[str, str] | None = None,
     entity_config: EntityConfig | None = None,
     allowlist: frozenset[str] | None = None,

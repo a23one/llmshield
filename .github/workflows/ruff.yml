@@ -18,10 +18,10 @@ jobs:
       - name: Run Ruff linter (fail on any issues)
         run: |
           # Fail if any linting issues are found
-          uv tool run ruff check llmshield/ tests/ --output-format=github
+          uv run --frozen ruff check llmshield/ tests/ --output-format=github
 
           # Additional check to ensure zero issues
-          ISSUES=$(uv tool run ruff check llmshield/ tests/ --quiet | wc -l || echo 0)
+          ISSUES=$(uv run --frozen ruff check llmshield/ tests/ --quiet | wc -l || echo 0)
           if [ "$ISSUES" -gt 0 ]; then
             echo "❌ Found $ISSUES linting issues. Perfect score (0 issues) required."
             exit 1
@@ -29,12 +29,12 @@ jobs:
           echo "✅ Perfect linting score achieved (0 issues)"
 
       - name: Run Ruff formatter check (fail on any format issues)
-        run: uv tool run ruff format llmshield/ tests/ --check --diff
+        run: uv run --frozen ruff format llmshield/ tests/ --check --diff
 
       - name: Generate Ruff report
         if: always()
         run: |
           echo "## Ruff Linting Summary" >> $GITHUB_STEP_SUMMARY
           echo "Files checked: $(find llmshield tests -name '*.py' | wc -l)" >> $GITHUB_STEP_SUMMARY
-          echo "Issues found: $(uv tool run ruff check llmshield/ tests/ --quiet | wc -l || echo 0)" >> $GITHUB_STEP_SUMMARY
-          echo "Format issues: $(uv tool run ruff format llmshield/ tests/ --check | wc -l || echo 0)" >> $GITHUB_STEP_SUMMARY
+          echo "Issues found: $(uv run --frozen ruff check llmshield/ tests/ --quiet | wc -l || echo 0)" >> $GITHUB_STEP_SUMMARY
+          echo "Format issues: $(uv run --frozen ruff format llmshield/ tests/ --check | wc -l || echo 0)" >> $GITHUB_STEP_SUMMARY

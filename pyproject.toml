@@ -25,8 +25,11 @@ keywords = ["llm", "ai", "security", "privacy"]
 requires-python = ">=3.12"
 
 [project.urls]
-Homepage = "https://github.com/brainpolo/llmshield"
-Issues = "https://github.com/brainpolo/llmshield/issues"
+Homepage = "https://llmshield.dev"
+Documentation = "https://a23one.github.io/llmshield/"
+Repository = "https://github.com/a23one/llmshield"
+Issues = "https://github.com/a23one/llmshield/issues"
+Changelog = "https://github.com/a23one/llmshield/blob/main/CHANGELOG.md"
 
 [tool.setuptools]
 packages = [
